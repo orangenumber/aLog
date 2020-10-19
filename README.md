@@ -1,6 +1,6 @@
 # alog
 
-(c) 2020 Gon Y Yi. <https://gonyyi.com/copyright.txt>
+(c) 2020 Gon Y Yi. <https://gonyyi.com/copyright.txt>  
 Last update: 10/18/2020
 
 
