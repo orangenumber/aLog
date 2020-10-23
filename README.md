@@ -99,8 +99,8 @@ import (
 )
 
 func main() {
-	out, _ := os.Create("test.log")
-	x := alog.New(out, "test ", alog.O_PREFIX|alog.O_TIME|alog.O_DATE)
+    out, _ := os.Create("test.log")
+    x := alog.New(out, "test ", alog.O_PREFIX|alog.O_TIME|alog.O_DATE)
     x.Printf("Name: %s\nAge: %d", "Gon", 17)
     a := struct {
         Name  string `json:"name"`
