@@ -67,7 +67,7 @@ Alog also can be used without creating an object.
 package main
 
 import (
-	"github.com/gonyyi/alog"
+    "github.com/gonyyi/alog"
     "os"
 )
 
@@ -103,13 +103,13 @@ func main() {
 	x := alog.New(out, "test ", alog.O_PREFIX|alog.O_TIME|alog.O_DATE)
     x.Printf("Name: %s\nAge: %d", "Gon", 17)
     a := struct {
-    		Name  string `json:"name"`
-    		City  string `json:"city"`
-    		Count int    `json:"cnt"`
-    	}{
-    		Name: "Gon",
-    		City: "Conway",
-    	}
+        Name  string `json:"name"`
+        City  string `json:"city"`
+        Count int    `json:"cnt"`
+    }{
+        Name: "Gon",
+        City: "Conway",
+    }
     x.Printj("log|", &a)
     x.Close()
 }
