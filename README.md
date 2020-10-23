@@ -34,6 +34,20 @@ Please note that Alog's `Printf` does not support same formatting of `fmt.Printf
         - `F_USE_BUF_2K`: Use buffer of 2K.
         - `F_STD`: Use `F_MMDD`, `F_TIME`, and `F_PREFIX`
 
+__Note:__ for a higher performance, use `if` condition in front of the log call,
+    by doing so, potentially many string operation won't need to run and save
+    potential memory allocation.
+
+```go
+var debug = false
+var info = true
+var l = alog.New(os.Stdout, "", alog.STD)
+```
+
+```go
+if debug {l.Print("[Debug] " + someValue + " / " + someValue2 )}
+```
+
 ### Creating an alog instance
 
 Alog can be created by `New(output io.Writer, prefix string, flag uint16) *ALogger`.
@@ -52,13 +66,16 @@ Alog also can be used without creating an object.
 ```go
 package main
 
-import "github.com/gonyyi/alog"
+import (
+	"github.com/gonyyi/alog"
+    "os"
+)
 
 func main() {
     alog.Print("Hello") // standard output
     alog.SetOutput(alog.Discard) // change output to Discard.
     alog.Print("Discarded Hello")
-    alog.SetOutput(os.StdErr) // use standard error
+    alog.SetOutput(os.Stderr) // use standard error
     alog.Print("Stderr Hello")
 
     alog.SetFlag(alog.F_STD) // set standard (MMDD, TIME, PREFIX)
@@ -76,7 +93,10 @@ __With new object__
 ```go
 package main
 
-import "github.com/gonyyi/alog"
+import (
+    "github.com/gonyyi/alog"
+    "os"
+)
 
 func main() {
 	out, _ := os.Create("test.log")
