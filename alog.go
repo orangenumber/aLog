@@ -34,7 +34,7 @@ const (
 // ========================
 // LOG LEVEL
 // ========================
-type Level uint
+type Level uint64
 
 const (
 	DEBUG Level = 1 << iota
