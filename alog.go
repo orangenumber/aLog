@@ -120,6 +120,9 @@ func (l *ALogger) LvIsEnabled(lvl Level) bool {
 func (l *ALogger) LvDisable(lvl Level) {
 	l.lvl = l.lvl &^ lvl
 }
+func (l *ALogger) LvOverride(lvl Level) {
+	l.lvl = lvl
+}
 
 // formatHeader is modified from builtin logger
 func (l *ALogger) formatHeader(buf *[]byte, t time.Time) {
