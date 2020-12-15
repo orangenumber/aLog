@@ -42,6 +42,16 @@ import (
 		| Benchmark_ALog_Print_Buf-12  | 3682484 | 355 ns/op  | 0 B/op | 0 allocs/op |
 		| Benchmark_ALog_Printj_Buf-12 | 2053513 | 595 ns/op  | 0 B/op | 0 allocs/op |
 
+	v1.1.0 (support level)
+		| Test                         | NoOfRun | Speed      | Mem    | Alloc       |
+		|:-----------------------------|:--------|:-----------|:-------|:------------|
+		| Benchmark_ALog_Print-12      | 432720  | 2718 ns/op | 0 B/op | 0 allocs/op |
+		| Benchmark_ALog_Printf-12     | 411183  | 2769 ns/op | 0 B/op | 0 allocs/op |
+		| Benchmark_ALog_Printj-12     | 336685  | 3250 ns/op | 0 B/op | 0 allocs/op |
+		| Benchmark_ALog_Printf_Buf-12 | 3485294 | 334 ns/op  | 0 B/op | 0 allocs/op |
+		| Benchmark_ALog_Print_Buf-12  | 3682484 | 355 ns/op  | 0 B/op | 0 allocs/op |
+		| Benchmark_ALog_Printj_Buf-12 | 2053513 | 595 ns/op  | 0 B/op | 0 allocs/op |
+
 */
 
 // =====================================================================================================================
@@ -54,6 +64,72 @@ func Test_ALog(t *testing.T) {
 	exp := "test: alog\n"
 	if b.String() != exp {
 		t.Fatalf("unexpected: exp=<%s>; act=<%s>", exp, b.String())
+	}
+}
+func Test_ALog_Level_Check(t *testing.T) {
+	var b bytes.Buffer
+	l := alog.New(&b, "", 0)
+	l.LvEnable(alog.ALL)
+	test := func(s string) {
+		println(s, "debug:", l.LvIsEnabled(alog.DEBUG))
+		println(s, "info: ", l.LvIsEnabled(alog.INFO))
+		println(s, "warn: ", l.LvIsEnabled(alog.WARN))
+		println(s, "error:", l.LvIsEnabled(alog.ERROR))
+		println(s, "fatal:", l.LvIsEnabled(alog.FATAL))
+	}
+	test("t1")
+	l.LvDisable(alog.ERROR | alog.INFO)
+	test("t2")
+	l.LvEnable(alog.ERROR | alog.INFO)
+	test("t3")
+}
+func Test_ALog_Level(t *testing.T) {
+	var b bytes.Buffer
+	l := alog.New(&b, "", 0)
+
+	{
+		testPrint := func(s string) {
+			l.Printfl(alog.DEBUG, "debug: %s", s)
+			l.Printfl(alog.INFO, "info: %s", s)
+			l.Printfl(alog.WARN, "warn: %s", s)
+			l.Printfl(alog.ERROR, "error: %s", s)
+			l.Printfl(alog.FATAL, "fatal: %s", s)
+		}
+
+		testPrint("t1")
+		l.LvDisable(alog.INFO | alog.WARN)
+
+		testPrint("t2")
+		l.LvEnable(alog.DEBUG | alog.WARN)
+		testPrint("t3")
+
+		exp := "info: t1\nwarn: t1\nerror: t1\nfatal: t1\nerror: t2\nfatal: t2\ndebug: t3\nwarn: t3\nerror: t3\nfatal: t3\n"
+		if b.String() != exp {
+			t.Fatalf("unexpected: exp=<%s>; act=<%s>", exp, b.String())
+		}
+	}
+	{
+		l.LvEnable(alog.WARN | alog.INFO | alog.ERROR | alog.FATAL)
+		l.LvDisable(alog.DEBUG)
+		b.Reset()
+		testPrint := func(s string) {
+			l.Printl(alog.DEBUG, "debug: "+s)
+			l.Printl(alog.INFO, "info: "+s)
+			l.Printl(alog.WARN, "warn: "+s)
+			l.Printl(alog.ERROR, "error: "+s)
+			l.Printl(alog.FATAL, "fatal: "+s)
+		}
+
+		testPrint("t1")
+		l.LvDisable(alog.INFO | alog.WARN)
+		testPrint("t2")
+		l.LvEnable(alog.DEBUG | alog.WARN)
+		testPrint("t3")
+
+		exp := "info: t1\nwarn: t1\nerror: t1\nfatal: t1\nerror: t2\nfatal: t2\ndebug: t3\nwarn: t3\nerror: t3\nfatal: t3\n"
+		if b.String() != exp {
+			t.Fatalf("unexpected: exp=<%s>; act=<%s>", exp, b.String())
+		}
 	}
 }
 func Test_ALog_Close(t *testing.T) {
@@ -122,7 +198,17 @@ func Benchmark_ALog_Print_Buf(b *testing.B) {
 	b.StopTimer()
 	b.ReportAllocs()
 }
-
+func Benchmark_ALog_Printfl(b *testing.B) {
+	b.StartTimer()
+	out, _ := os.Create("./tmp/alog_printfl.txt")
+	x := alog.New(out, "test ", alog.F_STD|alog.F_MICROSEC|alog.F_DATE)
+	for i := 0; i < b.N; i++ {
+		x.Printfl(alog.INFO, "sample with %d", i) // fmt.Fprintf() can't be easily optimized.. maybe need to write my own..
+	}
+	x.Close()
+	b.StopTimer()
+	b.ReportAllocs()
+}
 func Benchmark_ALog_Printf(b *testing.B) {
 	b.StartTimer()
 	out, _ := os.Create("./tmp/alog_printf.txt")
