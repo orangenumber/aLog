@@ -14,8 +14,13 @@ const newline = byte('\n')
 
 var unsuppType = []byte("?{unexp}")
 
+// ========================
+// LOG FORMAT
+// ========================
+type Format uint16
+
 const (
-	F_TIME uint16 = 1 << iota
+	F_TIME Format = 1 << iota
 	F_MMDD
 	F_MICROSEC
 	F_PREFIX
@@ -29,10 +34,10 @@ const (
 // ========================
 // LOG LEVEL
 // ========================
-type level uint
+type Level uint
 
 const (
-	DEBUG level = 1 << iota
+	DEBUG Level = 1 << iota
 	INFO
 	WARN
 	ERROR
@@ -53,12 +58,12 @@ type ALogger struct {
 	buf2    tinyBuffer
 	mu      sync.Mutex
 	prefix  []byte
-	flag    uint16
 	jsonEnc *json.Encoder
-	lvl     level
+	flag    Format
+	lvl     Level
 }
 
-func New(output io.Writer, prefix string, flag uint16) *ALogger {
+func New(output io.Writer, prefix string, flag Format) *ALogger {
 	if output == nil {
 		output = Discard
 	}
@@ -96,23 +101,23 @@ func (l *ALogger) SetPrefix(s string) {
 	l.prefix = []byte(s)
 	l.mu.Unlock()
 }
-func (l *ALogger) SetFlag(flag uint16) {
+func (l *ALogger) SetFlag(flag Format) {
 	l.mu.Lock()
 	l.flag = flag
 	l.mu.Unlock()
 }
 
-func (l *ALogger) LvEnable(lvl level) {
+func (l *ALogger) LvEnable(lvl Level) {
 	l.lvl = l.lvl | lvl
 }
 
-func (l *ALogger) LvIsEnabled(lvl level) bool {
+func (l *ALogger) LvIsEnabled(lvl Level) bool {
 	if l.lvl&lvl != 0 {
 		return true
 	}
 	return false
 }
-func (l *ALogger) LvDisable(lvl level) {
+func (l *ALogger) LvDisable(lvl Level) {
 	l.lvl = l.lvl &^ lvl
 }
 
@@ -252,7 +257,7 @@ func (l *ALogger) Printf(format string, a ...interface{}) {
 		l.buf = l.buf[:0]
 	}
 }
-func (l *ALogger) Printfl(lvl level, format string, a ...interface{}) {
+func (l *ALogger) Printfl(lvl Level, format string, a ...interface{}) {
 	if l.lvl&lvl == 0 {
 		return
 	}
@@ -405,7 +410,7 @@ func (l *ALogger) Print(a ...interface{}) {
 	}
 }
 
-func (l *ALogger) Printl(lvl level, a ...interface{}) {
+func (l *ALogger) Printl(lvl Level, a ...interface{}) {
 	if l.lvl&lvl == 0 {
 		return
 	}
@@ -504,7 +509,7 @@ func (l *ALogger) Printj(addPrefix string, a interface{}) {
 	}
 }
 
-func (l *ALogger) Printjl(lvl level, addPrefix string, a interface{}) {
+func (l *ALogger) Printjl(lvl Level, addPrefix string, a interface{}) {
 	if l.lvl&lvl == 0 {
 		return
 	}

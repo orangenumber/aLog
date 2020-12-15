@@ -42,7 +42,7 @@ import (
 		| Benchmark_ALog_Print_Buf-12  | 3682484 | 355 ns/op  | 0 B/op | 0 allocs/op |
 		| Benchmark_ALog_Printj_Buf-12 | 2053513 | 595 ns/op  | 0 B/op | 0 allocs/op |
 
-	v1.1.0 (support level)
+	v1.1.0 (support Level)
 		| Test                         | NoOfRun | Speed      | Mem    | Alloc       |
 		|:-----------------------------|:--------|:-----------|:-------|:------------|
 		| Benchmark_ALog_Print-12      | 432720  | 2718 ns/op | 0 B/op | 0 allocs/op |

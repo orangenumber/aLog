@@ -27,6 +27,6 @@ func SetOutput(output io.Writer) {
 func SetPrefix(prefix string) {
 	std.SetPrefix(prefix)
 }
-func SetFlag(flag uint16) {
+func SetFlag(flag Format) {
 	std.SetFlag(flag)
 }
